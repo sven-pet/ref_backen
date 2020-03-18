@@ -1,6 +1,31 @@
 import requests
 import json
 
+def fill_data_base():
+    r = Riksdagen()
+    agendor = r.get_kalender()
+    for agenda in agendor['kalenderlista']['kalender']:
+        if str(agenda['XRDDATA']).count('}'):
+            documents = str(agenda['XRDDATA']).split('}')[0].replace('dok_id{', '').split(',')
+        else:
+            documents = []
+        descriptions = str(agenda['DESCRIPTION'][1]).split('\\n\\n')
+        for description in descriptions:
+            description = description.replace('\\n', '')
+            description = description.replace('\\', '')
+        agenda_dict = {
+            "End": agenda['DTEND'],
+            "Start": agenda['DTSTART'],
+            "Created": agenda['CREATED'],
+            "Documents": str(documents),
+            "Description": str(descriptions)
+        }
+
+        for document_id in documents:
+            document = r.get_documents(document_id)['dokumentlista']['dokument'][0]
+            print (document)
+
+
 class Riksdagen (object):
     def get_kalender(self):
 
@@ -16,7 +41,7 @@ class Riksdagen (object):
         r = requests.get(url, params=payload)
         return json.loads(r.content)
 
-'''class Meeting(object):
+class Meeting(object):
 
     def __init__(self, agenda):
         descriptions = str(agenda['DESCRIPTION'][1]).split('\\n\\n')
@@ -52,4 +77,4 @@ class Riksdagen (object):
         for description in self.desc:
             print (description)
         print('')
-        print('**********************************************')'''
+        print('**********************************************')

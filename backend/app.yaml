@@ -1,1 +1,4 @@
+# [START gae_python37_custom_runtime]
 runtime: python37
+entrypoint: gunicorn -b :$PORT main:app
+# [END gae_python37_custom_runtime]
